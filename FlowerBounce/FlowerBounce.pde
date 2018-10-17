@@ -1,6 +1,6 @@
 ArrayList<Flowerbud> flowers;
 
-int r=60;
+int r = 60, timer = 0;
 float ballX;
 float ballY;
 
@@ -27,15 +27,13 @@ void draw()
   }
 
   if (flowers.size() == flowerAmount) {
-    flowers.remove(0);
+    timer += 1;
+    if (timer == 60) {
+      flowers.remove(0);
+      timer = 0;
+    }
   }
 }
-
-/*void spawnFlower() 
-{
-  delay(3000);
-  flowers.add(new Flowerbud(random(width), random(height), (int)random(3, 12), random(10, 100), color(random(255), random(255), random(255)), (int)random(2), random(-5, 5), random(-5, 5)));
-}*/
 
 class Flowerbud 
 {
