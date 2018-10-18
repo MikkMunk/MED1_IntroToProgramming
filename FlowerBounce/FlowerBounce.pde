@@ -1,6 +1,6 @@
 ArrayList<Flowerbud> flowers;
 
-int r = 60, timer = 0;
+int r = 60, timer = 0, timerLimit = 120, col1 = 122, col2 = 122, col3 = 122, colChange = 10;
 float ballX;
 float ballY;
 
@@ -16,7 +16,41 @@ void setup() {
 
 void draw()
 {
-  background(#08FAEC);
+  col1 += (int)random(-colChange, colChange);
+  col2 += (int)random(-colChange, colChange);
+  col3 += (int)random(-colChange, colChange);
+
+  if (col1 < 0) 
+  {
+    col1 = 0;
+  }
+
+  if (col1 > 255) 
+  {
+    col1 = 255;
+  }
+
+  if (col2 < 0) 
+  {
+    col2 = 0;
+  }
+
+  if (col2 > 255) 
+  {
+    col2 = 255;
+  }
+
+  if (col3 < 0) 
+  {
+    col3 = 0;
+  }
+
+  if (col3 > 255) 
+  {
+    col3 = 255;
+  }
+
+  background(color(col1, col2, col3));
   if (flowers.size() < flowerAmount) {
     flowers.add(new Flowerbud(random(width), random(height), (int)random(3, 12), random(10, 100), color(random(255), random(255), random(255)), (int)random(2), random(-5, 5), random(-5, 5)));
   }
@@ -28,7 +62,7 @@ void draw()
 
   if (flowers.size() == flowerAmount) {
     timer += 1;
-    if (timer == 60) {
+    if (timer == timerLimit) {
       flowers.remove(0);
       timer = 0;
     }
