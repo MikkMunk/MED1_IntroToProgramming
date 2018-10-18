@@ -7,11 +7,15 @@ int r = 60,
   col2 = 122, 
   col3 = 122, 
   colChange = 10, 
-  ballRadius = 20;
+  ballRadius = 20, 
+  flowerAmount = 30, 
+  cornerCounter = 0, 
+  counterTimer = 0;
+
 float ballX, 
   ballY;
 
-int flowerAmount = 30;
+boolean playerHit = false;
 
 void setup() {
   size(1200, 800);
@@ -59,7 +63,7 @@ void draw()
 
   background(color(col1, col2, col3));
   if (flowers.size() < flowerAmount) {
-    flowers.add(new Flowerbud(random(width), random(height), (int)random(3, 12), random(10, 100), (int)random(255), (int)random(255), (int)random(255), (int)random(2), random(-5, 5), random(-5, 5)));
+    flowers.add(new Flowerbud(random(width), random(height), (int)random(5, 12), random(10, 50), (int)random(255), (int)random(255), (int)random(255), (int)random(2), random(-5, 5), random(-5, 5)));
   }
 
   for (int i = flowers.size()-1; i >= 0; i--) {
@@ -67,6 +71,7 @@ void draw()
     flower.display();
     if (playerObjectHit(flower.xPos, flower.yPos, flower.radius) == true) {
       ballRadius = 0;
+      playerHit = true;
     }
   }
 
@@ -80,6 +85,22 @@ void draw()
 
   fill(0, 255, 0);
   ellipse(mouseX, mouseY, ballRadius, ballRadius);
+  
+  if (playerHit == false) {
+    counterTimer += 1;
+    textAlign(LEFT, CENTER);
+    textSize(20);
+    text("Seconds: " + cornerCounter, 10, 30);
+  } else {
+    textAlign(CENTER, CENTER);
+    textSize(200);
+    text(cornerCounter, width / 2, height / 2);
+  }
+
+  if (counterTimer == 60) {
+    cornerCounter += 1;
+    counterTimer = 0;
+  }
 }
 
 class Flowerbud 
@@ -152,6 +173,7 @@ class Flowerbud
     xPos += xVel;
     yPos += yVel;
 
+    noStroke();
     for (float i = 0; i < PI*2; i += 2 * PI/petalAmount) {
       ballX = xPos + radius*cos(i);
       ballY = yPos + radius*sin(i);
@@ -162,7 +184,8 @@ class Flowerbud
     } else {
       fill(255, 0, 0);
     }
-    ellipse(xPos, yPos, radius*1.2, radius*1.2);
+    stroke(0);
+    ellipse(xPos, yPos, radius*2, radius*2);
   }
 }
 
@@ -170,7 +193,7 @@ boolean playerObjectHit(float flowerX, float flowerY, float flowerRad)
 {
   float d = dist(flowerX, flowerY, mouseX, mouseY);
 
-  if (d < flowerRad + ballRadius) {
+  if (d < ((flowerRad * 1.4) + (ballRadius / 2))) {
     return true;
   } else {
     return false;
@@ -178,5 +201,10 @@ boolean playerObjectHit(float flowerX, float flowerY, float flowerRad)
 }
 
 void mousePressed() {
-  ballRadius += 10;
+  if (ballRadius < 20) {
+    ballRadius = 20;
+    cornerCounter = 0;
+    counterTimer = 0;
+    playerHit = false;
+  }
 }
