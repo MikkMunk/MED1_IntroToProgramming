@@ -1,8 +1,15 @@
 ArrayList<Flowerbud> flowers;
 
-int r = 60, timer = 0, timerLimit = 120, col1 = 122, col2 = 122, col3 = 122, colChange = 10;
-float ballX;
-float ballY;
+int r = 60, 
+  timer = 0, 
+  timerLimit = 120, 
+  col1 = 122, 
+  col2 = 122, 
+  col3 = 122, 
+  colChange = 10, 
+  ballRadius = 20;
+float ballX, 
+  ballY;
 
 int flowerAmount = 30;
 
@@ -52,12 +59,15 @@ void draw()
 
   background(color(col1, col2, col3));
   if (flowers.size() < flowerAmount) {
-    flowers.add(new Flowerbud(random(width), random(height), (int)random(3, 12), random(10, 100), color(random(255), random(255), random(255)), (int)random(2), random(-5, 5), random(-5, 5)));
+    flowers.add(new Flowerbud(random(width), random(height), (int)random(3, 12), random(10, 100), (int)random(255), (int)random(255), (int)random(255), (int)random(2), random(-5, 5), random(-5, 5)));
   }
 
   for (int i = flowers.size()-1; i >= 0; i--) {
     Flowerbud flower = flowers.get(i);
     flower.display();
+    if (playerObjectHit(flower.xPos, flower.yPos, flower.radius) == true) {
+      ballRadius = 0;
+    }
   }
 
   if (flowers.size() == flowerAmount) {
@@ -67,21 +77,25 @@ void draw()
       timer = 0;
     }
   }
+
+  fill(0, 255, 0);
+  ellipse(mouseX, mouseY, ballRadius, ballRadius);
 }
 
 class Flowerbud 
 {
   float xPos, yPos, radius, xVel, yVel;
-  int petalAmount, centerColour;
-  color petalColour;
+  int petalAmount, centerColour, col1, col2, col3, colChange = 10;
 
-  Flowerbud(float x, float y, int n_petals, float r, color petalCol, int centerCol, float xVel_temp, float yVel_temp) 
+  Flowerbud(float x, float y, int n_petals, float r, int petalCol1, int petalCol2, int petalCol3, int centerCol, float xVel_temp, float yVel_temp) 
   {
     xPos = x;
     yPos = y;
     petalAmount = n_petals;
     radius = r;
-    petalColour = petalCol;
+    col1 = petalCol1;
+    col2 = petalCol2;
+    col3 = petalCol3;
     centerColour = centerCol;
     xVel = xVel_temp;
     yVel = yVel_temp;
@@ -89,7 +103,41 @@ class Flowerbud
 
   void display() 
   {
-    fill(petalColour);
+    col1 += (int)random(-colChange, colChange);
+    col2 += (int)random(-colChange, colChange);
+    col3 += (int)random(-colChange, colChange);
+
+    if (col1 < 0) 
+    {
+      col1 = 0;
+    }
+
+    if (col1 > 255) 
+    {
+      col1 = 255;
+    }
+
+    if (col2 < 0) 
+    {
+      col2 = 0;
+    }
+
+    if (col2 > 255) 
+    {
+      col2 = 255;
+    }
+
+    if (col3 < 0) 
+    {
+      col3 = 0;
+    }
+
+    if (col3 > 255) 
+    {
+      col3 = 255;
+    }
+
+    fill(color(col1, col2, col3));
 
     if (xPos > width || xPos < 0) 
     {
@@ -118,9 +166,17 @@ class Flowerbud
   }
 }
 
-void mousePressed() 
+boolean playerObjectHit(float flowerX, float flowerY, float flowerRad) 
 {
-  flowers.add(new Flowerbud(mouseX, mouseY, (int)random(3, 12), random(10, 100), color(random(255), random(255), random(255)), (int)random(2), random(-15, 15), random(-15, 15)));
+  float d = dist(flowerX, flowerY, mouseX, mouseY);
 
-  flowers.remove(0);
+  if (d < flowerRad + ballRadius) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+void mousePressed() {
+  ballRadius += 10;
 }
