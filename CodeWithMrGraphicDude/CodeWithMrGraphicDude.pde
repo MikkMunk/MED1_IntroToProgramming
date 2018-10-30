@@ -29,7 +29,7 @@ void draw() {
       particles.remove(i);
     }
   }
-  
+
   fill(0, 220, 50, 100);
   ellipse(width / 2, height * 2, height * 2.5, height * 2.5);
 }
@@ -53,7 +53,7 @@ class Particle {
     col3 = col3_temp;
     mouseXVel = mouseXVel_temp;
     mouseYVel = mouseYVel_temp;
-    
+
     this.pos = new PVector(mouseX, mouseY);
     this.vel = new PVector(random(-2, 2) - mouseXVel, random(-2, 2) - mouseYVel);
     this.life = 255;
@@ -66,12 +66,12 @@ class Particle {
       noStroke();
       ellipse(this.pos.x, this.pos.y, size, size);
     }
-    
-    if(dist(this.pos.x, this.pos.y, width / 2, height * 2) <= (this.size / 2) + ((height * 2.5) / 2)) {
+
+    if (dist(this.pos.x, this.pos.y, width / 2, height * 2) <= (this.size / 2) + ((height * 2.5) / 2)) {
       this.vel.y *= -0.6;
-      this.pos.y -= 1; 
+      this.pos.y -= 1;
     }
-    
+
     this.pos.add(this.vel);
     this.vel.add(g);
   }
