@@ -16,7 +16,6 @@ class Particle {
     fill(255, 102);
     ellipse(x, y, d, d);
     fill(0);
-    textAlign(CENTER, CENTER);
     text(number, x, y);
   }
 }

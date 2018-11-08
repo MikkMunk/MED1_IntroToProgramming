@@ -7,12 +7,14 @@ int indexPosition = 0;
 void setup() { 
   size(1200, 800);
   noStroke();
+  textAlign(CENTER, CENTER);
   background(0);
 }
 
 void draw() {
 }
 
+//Switch between the examples here
 void mousePressed() {
   //firstExample();
   secondExample();
@@ -55,7 +57,7 @@ void secondExample() {
     particle[pos] = new Particle(x[pos], y[pos], 20, pos);
     particle[pos].update();
 
-    println(pos);
+    //println(pos);
   }
 }
 
@@ -92,15 +94,15 @@ void secondExample() {
 //for (int i = 0; i < num; i++) {
 //i = 0;
 //int 2 = (2 + 0) % num;
-//ellipse(x[2] 0, 0, 20, 20);
+//ellipse(x[2] 0, y[2] 0, 20, 20);
 
 //i = 1;
 //int 3 = (2 + 1) % num;
-//ellipse(x[3] 0, 0, 20, 20);
+//ellipse(x[3] 0, y[3] 0, 20, 20);
 
 //i = 2;
 //int 4 = (2 + 2) % num;
-//ellipse(x[4] 0, 0, 20, 20);
+//ellipse(x[4] 0, y[4] 0, 20, 20);
 
 //i = 3;
 //int 0 = (2 + 3) % num;
