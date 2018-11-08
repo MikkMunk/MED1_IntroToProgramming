@@ -4,10 +4,24 @@ ArrayList<Particle> particles;
 float mouseXPre, 
   mouseXDif, 
   mouseYPre, 
-  mouseYDif;
+  mouseYDif, 
+  groundEllipseX, 
+  groundEllipseY, 
+  groundEllipseD, 
+  flyingEllipseX, 
+  flyingEllipseY, 
+  flyingEllipseD;
 
 void setup() {
   size(1200, 800);
+
+  groundEllipseX = width / 2;
+  groundEllipseY = height * 2;
+  groundEllipseD = height * 2.5;
+
+  flyingEllipseX = width / 3;
+  flyingEllipseY = height / 3;
+  flyingEllipseD = height * 0.3;
 
   particles = new ArrayList<Particle>();
 }
@@ -24,6 +38,15 @@ void draw() {
 
   for (int i = particles.size()-1; i >= 0; i--) {
     particles.get(i).update();
+    
+    //Use if you want particles to interact with each other
+    /*for (int o = 0; o != i && o <= particles.size(); o++) {
+     if (dist(particles.get(i).pos.x, particles.get(i).pos.y, particles.get(o).pos.x, particles.get(o).pos.y) <= (particles.get(i).size / 2) + (particles.get(o).size / 2)) {
+     
+     particles.get(i).vel.y *= -0.6;
+     particles.get(i).pos.y -= 1;
+     }
+     }*/
 
     if (particles.get(i).size < 0) {
       particles.remove(i);
@@ -31,48 +54,8 @@ void draw() {
   }
 
   fill(0, 220, 50, 100);
-  ellipse(width / 2, height * 2, height * 2.5, height * 2.5);
-}
+  ellipse(groundEllipseX, groundEllipseY, groundEllipseD, groundEllipseD);
 
-class Particle {
-
-  PVector pos, 
-    vel;
-  int life, 
-    col1, 
-    col2, 
-    col3;
-  float mouseXVel, 
-    mouseYVel, 
-    size;
-
-  Particle(float mouseXVel_temp, float mouseYVel_temp, int col1_temp, int col2_temp, int col3_temp, float size_temp) {
-    size = size_temp;
-    col1 = col1_temp;
-    col2 = col2_temp;
-    col3 = col3_temp;
-    mouseXVel = mouseXVel_temp;
-    mouseYVel = mouseYVel_temp;
-
-    this.pos = new PVector(mouseX, mouseY);
-    this.vel = new PVector(random(-2, 2) - mouseXVel, random(-2, 2) - mouseYVel);
-    this.life = 255;
-  }
-
-  void update() {
-    size -= .2;
-    if (size > 0) {
-      fill(col1, col2, col3, 100);
-      noStroke();
-      ellipse(this.pos.x, this.pos.y, size, size);
-    }
-
-    if (dist(this.pos.x, this.pos.y, width / 2, height * 2) <= (this.size / 2) + ((height * 2.5) / 2)) {
-      this.vel.y *= -0.6;
-      this.pos.y -= 1;
-    }
-
-    this.pos.add(this.vel);
-    this.vel.add(g);
-  }
+  fill(255, 255, 0, 130);
+  ellipse(flyingEllipseX, flyingEllipseY, flyingEllipseD, flyingEllipseD);
 }
