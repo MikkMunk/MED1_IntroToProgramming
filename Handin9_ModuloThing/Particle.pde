@@ -2,15 +2,16 @@ class Particle {
 
   PVector pos;
   
-  int petalAmount = 5, col1 = (int)random(255), col2 = (int)random(255), col3 = (int)random(255), alpha = 150;
+  int number, petalAmount = 5, col1 = (int)random(255), col2 = (int)random(255), col3 = (int)random(255), alpha = 150;
   
   float x, 
   y, 
   size = 20;
 
-  Particle(float x_temp, float y_temp) {
+  Particle(float x_temp, float y_temp, int number_temp) {
     x = x_temp;
     y = y_temp;
+    number = number_temp;
   }
 
   void update() {
@@ -22,5 +23,7 @@ class Particle {
       ellipse(ballX, ballY, size, size);
     }
     ellipse(x, y, size, size);
+    fill(0);
+    text(number, x, y);
   }
 }
