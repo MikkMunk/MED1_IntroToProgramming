@@ -16,8 +16,8 @@ void draw() {
 
 //Switch between the examples here
 void mousePressed() {
-  //firstExample();
-  secondExample();
+  firstExample();
+  //secondExample();
 }
 
 void firstExample() {
