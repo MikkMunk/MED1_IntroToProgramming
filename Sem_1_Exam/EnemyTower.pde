@@ -31,9 +31,11 @@ class EnemyTower {
     pushMatrix();
     translate(xPos, yPos);
 
+    if(healthCurrent < healthMax){
     healthbarFill = size*(healthCurrent/healthMax);
     fill(255, 0, 0, 100);
     rect(0, -size, healthbarFill, size/10);
+    }
 
     rotate(towerRotation);
 

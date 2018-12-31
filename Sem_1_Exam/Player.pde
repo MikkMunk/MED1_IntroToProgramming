@@ -34,6 +34,11 @@ class Player {
     minimumTurretRot = 100, 
     bulletPerShot = 5;
 
+  color bodyCol = #5F6164,
+  armCol = #4B4E52,
+  legCol = #2B2C2E,
+  glassCol = #799BCE;
+
   boolean walkAnim = false, 
     legReverse = false, 
     fireReady = true, 
@@ -76,7 +81,7 @@ class Player {
     pushMatrix();
     rotate(legRotation);
 
-    fill(#2B2C2E);
+    fill(legCol);
     rect(legMove, legPos, legLength, legWidth);
     rect(-legMove, -legPos, legLength, legWidth);
 
@@ -84,11 +89,14 @@ class Player {
     pushMatrix();
     rotate(bodyRotation);
 
-    fill(#5F6164);
+    fill(bodyCol);
     rect(0, 0, bodyLength, bodyWidth);
     for (int i = enemyBullets.size()-1; i >= 0; i--) {
-      if (dist(enemyBullets.get(i).xPos, enemyBullets.get(i).yPos, xPos, yPos) <= ((bodyWidth/2)+(enemyBullets.get(i).size/2))) {
+      if (dist(enemyBullets.get(i).xPos, enemyBullets.get(i).yPos, xPos, yPos) <= ((bodyWidth/2)+(enemyBulletSize/2))) {
         healthCurrent -= enemyBullets.get(i).damage;
+        if(healthCurrent <= 0){
+          healthCurrent = 0;
+        }
         enemyBullets.remove(i);
       }
     }
@@ -96,7 +104,7 @@ class Player {
     fill(0);
     ellipse(driverPos, 0, driverLength, driverWidth);
 
-    fill(#799BCE, 200);
+    fill(glassCol, 200);
     rect(glassPos, 0, glassLength, glassWidth);
 
 
@@ -122,7 +130,7 @@ class Player {
 
     popMatrix();
 
-    fill(#4B4E52);
+    fill(armCol);
     rect(armXPos, armYPos, armLength, armWidth);
     rect(armXPos, -armYPos, armLength, armWidth);
 
@@ -138,7 +146,7 @@ class Player {
     }
 
     if (fireReady && fireActive) {
-      for (int i = 0; i < bulletPerShot;i++) {
+      for (int i = 0; i < bulletPerShot; i++) {
         playerBullets.add(new PlayerBullet(xPosPlayer, yPosPlayer, rotation, player.turretRotation, fireAltBarrel));
       }
       fireAltBarrel = !fireAltBarrel;

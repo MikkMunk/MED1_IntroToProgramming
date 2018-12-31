@@ -2,7 +2,9 @@ ArrayList<Area> areas;
 ArrayList<EnemyBullet> enemyBullets;
 ArrayList<PlayerBullet> playerBullets;
 ArrayList<EnemyTower> enemyTowers;
+ArrayList<Explosion> explosions;
 Player player;
+UserInterface ui;
 
 int areaNumber, 
   score;
@@ -19,6 +21,12 @@ float xPosPlayer,
   moveSpeed = 3, 
   moveRotation;
 
+int enemyBulletSize = 10, 
+  enemyBulletStrokeSize = enemyBulletSize/5;
+
+color enemyBulletFillCol = #FC2008, 
+  enemyBulletStrokeCol = #583430;
+
 boolean keyUp = false, 
   keyDown = false, 
   keyLeft = false, 
@@ -29,6 +37,8 @@ void setup() {
   //fullScreen();
   smooth();
   noStroke();
+  textAlign(CENTER, CENTER);
+  textSize(30);
   rectMode(CENTER);
 
   xPosPlayer = width/2;
@@ -38,7 +48,9 @@ void setup() {
   enemyBullets = new ArrayList<EnemyBullet>();
   playerBullets = new ArrayList<PlayerBullet>();
   enemyTowers = new ArrayList<EnemyTower>();
+  explosions = new ArrayList<Explosion>();
   player = new Player(xPosPlayer, yPosPlayer);
+  ui = new UserInterface();
 
   for (int x = -width; x <= width; x += width) {
     for (int y = -height; y <= height; y += height) {
@@ -141,12 +153,24 @@ void draw() {
       playerBullets.remove(i);
     }
   }
+  
+  for (int i = explosions.size()-1; i >= 0; i--) {
+    explosions.get(i).update();
+
+    if (explosions.get(i).alpha <= 0) {
+      explosions.remove(i);
+    }
+  }
 
   player.update();
+  ui.update();
+  
+  println(mouseX-width/2);
+  println(mouseY-height/2);
 
-  fill(0);
-  text("Health: " + player.healthCurrent, width/10, height/10*9);
-  text("Towers destroyed: " + score, width/10, height/10*9+10);
+  //fill(0);
+  //text("Health: " + player.healthCurrent, width/10, height/10*9);
+  //text("Towers destroyed: " + score, width/10, height/10*9+10);
 }
 
 void keyPressed() {
@@ -181,6 +205,7 @@ void keyReleased() {
 
 void mousePressed() {
   player.fireActive = true;
+  explosions.add(new Explosion());
 }
 
 void mouseReleased() {

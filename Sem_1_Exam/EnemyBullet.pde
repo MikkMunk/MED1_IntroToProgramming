@@ -2,15 +2,13 @@ class EnemyBullet {
 
   float xPos, 
     yPos, 
-    bulletDir,
+    bulletDir, 
     dirDeviation = radians(random(-10, 10)), 
     towerSize, 
-    distanceFlown,
+    distanceFlown, 
     damage = 5;
 
-  int size = 10, 
-    strokeSize = size/5, 
-    speed = 10;
+  int speed = 10;
 
   EnemyBullet(float x_temp, float y_temp, float rot_temp, float towerSize_temp) {
     xPos = x_temp;
@@ -33,10 +31,10 @@ class EnemyBullet {
     pushMatrix();
     translate(xPos, yPos);
 
-    fill(#FC2008, 200);
-    stroke(#583430, 200);
-    strokeWeight(strokeSize);
-    ellipse(0, 0, size, size);
+    fill(enemyBulletFillCol, 200);
+    stroke(enemyBulletStrokeCol, 200);
+    strokeWeight(enemyBulletStrokeSize);
+    ellipse(0, 0, enemyBulletSize, enemyBulletSize);
     noStroke();
     popMatrix();
   }
