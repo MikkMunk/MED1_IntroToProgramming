@@ -7,8 +7,10 @@ class Player {
     bodyRotation, 
     legMove = 0, 
     legMoveSpeed, 
-    legRotation,
-    turretRotation;
+    legRotation, 
+    turretRotation, 
+    fireDelayValue = 30, 
+    currentFireDelay = fireDelayValue;
 
   int bodyWidth = 50, 
     bodyLength = 40, 
@@ -28,11 +30,15 @@ class Player {
     legPos = 20, 
     legWidth = 20, 
     legLength = 35, 
-    legMoveCap = 10,
-    minimumTurretRot = 100;
+    legMoveCap = 10, 
+    minimumTurretRot = 100, 
+    bulletPerShot = 5;
 
   boolean walkAnim = false, 
-    legReverse = false;
+    legReverse = false, 
+    fireReady = true, 
+    fireActive = false, 
+    fireAltBarrel = false;
 
   Player(float x_temp, float y_temp) {
     xPos = x_temp;
@@ -99,7 +105,7 @@ class Player {
       mouseDist = minimumTurretRot;
     } 
     turretRotation = atan(mouseDist/turretPos);
-    
+
     fill(#7E8186);
     pushMatrix();
     translate(0, turretPos);
@@ -122,5 +128,21 @@ class Player {
 
     popMatrix();
     popMatrix();
+
+    if (!fireReady) {
+      currentFireDelay--;
+      if (currentFireDelay == 0) {
+        fireReady = true;
+        currentFireDelay = fireDelayValue;
+      }
+    }
+
+    if (fireReady && fireActive) {
+      for (int i = 0; i < bulletPerShot;i++) {
+        playerBullets.add(new PlayerBullet(xPosPlayer, yPosPlayer, rotation, player.turretRotation, fireAltBarrel));
+      }
+      fireAltBarrel = !fireAltBarrel;
+      fireReady = false;
+    }
   }
 }

@@ -8,7 +8,9 @@ class EnemyTower {
     healthbarFill, 
     size = 40, 
     healthMax = 100, 
-    healthCurrent = healthMax;
+    healthCurrent = healthMax, 
+    fireDelayValue = 60, 
+    currentFireDelay = fireDelayValue;
 
   boolean fireReady = true;
 
@@ -53,8 +55,17 @@ class EnemyTower {
     popMatrix();
     popMatrix();
 
+    if (!fireReady) {
+      currentFireDelay--;
+      if (currentFireDelay == 0) {
+        fireReady = true;
+        currentFireDelay = fireDelayValue;
+      }
+    }
+
     if (fireReady && dist(xPosPlayer, yPosPlayer, -areaXPos+xPos, -areaYPos+yPos) < width/2) {
       enemyBullets.add(new EnemyBullet(-areaXPos+xPos, -areaYPos+yPos, towerRotation, size));
+      fireReady = false;
     }
   }
 }

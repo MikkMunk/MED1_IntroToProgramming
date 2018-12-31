@@ -33,8 +33,8 @@ class EnemyBullet {
     pushMatrix();
     translate(xPos, yPos);
 
-    fill(#FC2008, 150);
-    stroke(#583430, 150);
+    fill(#FC2008, 200);
+    stroke(#583430, 200);
     strokeWeight(strokeSize);
     ellipse(0, 0, size, size);
     noStroke();

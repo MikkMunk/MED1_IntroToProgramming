@@ -4,7 +4,8 @@ ArrayList<PlayerBullet> playerBullets;
 ArrayList<EnemyTower> enemyTowers;
 Player player;
 
-int areaNumber;
+int areaNumber, 
+  score;
 
 float xPosPlayer, 
   yPosPlayer, 
@@ -21,9 +22,7 @@ float xPosPlayer,
 boolean keyUp = false, 
   keyDown = false, 
   keyLeft = false, 
-  keyRight = false, 
-  fireActive = false, 
-  fireAltBarrel = false;
+  keyRight = false;
 
 void setup() {
   size(1200, 800);
@@ -47,7 +46,14 @@ void setup() {
       areaNumber++;
     }
   }
+
+  for (int i = enemyTowers.size()-1; i >= 0; i--) {
+    if (dist(xPosPlayer, yPosPlayer, -areaXPos+enemyTowers.get(i).xPos, -areaYPos+enemyTowers.get(i).yPos) < width/2) {
+      enemyTowers.remove(i);
+    }
+  }
 }
+
 void draw() {
   //background(#EAC766);
 
@@ -115,13 +121,9 @@ void draw() {
     enemyTowers.get(i).update();
 
     if (enemyTowers.get(i).healthCurrent <= 0) {
+      score++;
       enemyTowers.remove(i);
     }
-  }
-
-  if (fireActive) {
-    playerBullets.add(new PlayerBullet(xPosPlayer, yPosPlayer, rotation, player.turretRotation, fireAltBarrel));
-    fireAltBarrel = !fireAltBarrel;
   }
 
   for (int i = enemyBullets.size()-1; i >= 0; i--) {
@@ -141,9 +143,10 @@ void draw() {
   }
 
   player.update();
-  
+
   fill(0);
   text("Health: " + player.healthCurrent, width/10, height/10*9);
+  text("Towers destroyed: " + score, width/10, height/10*9+10);
 }
 
 void keyPressed() {
@@ -177,11 +180,11 @@ void keyReleased() {
 }
 
 void mousePressed() {
-  fireActive = true;
+  player.fireActive = true;
 }
 
 void mouseReleased() {
-  fireActive = false;
+  player.fireActive = false;
 }
 
 void updateAreas(int i) {

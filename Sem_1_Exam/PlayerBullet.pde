@@ -3,12 +3,13 @@ class PlayerBullet {
   float xPos, 
     yPos, 
     bodyRot, 
+    dirDeviation = radians(random(-5, 5)), 
     turretRot, 
     distanceFlown, 
-    damage = 10;
+    speed = random(9, 11), 
+    damage = random(5, 10);
 
-  int size = 5, 
-    speed = 10;
+  int size = 5;
 
   boolean fireAlt;
 
@@ -31,8 +32,8 @@ class PlayerBullet {
   void update() {
 
     distanceFlown += speed;
-    xPos += cos(bodyRot) * speed;
-    yPos += sin(bodyRot) * speed;
+    xPos += cos(bodyRot+dirDeviation) * speed;
+    yPos += sin(bodyRot+dirDeviation) * speed;
 
     if (fireAlt) {
       xPos -= sin(bodyRot) * (HALF_PI-turretRot) * speed;
