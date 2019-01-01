@@ -26,12 +26,6 @@ class Area {
     for (int i = 0; i < towerAmount; i++) {
       towerY[i] = (int)yPos + (int)random(-height/2, height/2);
     }
-    if (number != 4) {
-      for (int i = 0; i < towerAmount; i++) {
-        enemyTowers.add(new EnemyTower(towerX[i], towerY[i], number));
-      }
-    }
-
     for (int i = 0; i < wallAmount; i++) {
       wallX[i] = (int)xPos + (int)random(-width/2, width/2);
     }
@@ -39,9 +33,12 @@ class Area {
       wallY[i] = (int)yPos + (int)random(-height/2, height/2);
     }
     if (number != 4) {
-    for (int i = 0; i < wallAmount; i++) {
-      walls.add(new Wall(wallX[i], wallY[i], number));
-    }
+      for (int i = 0; i < towerAmount; i++) {
+        enemyTowers.add(new EnemyTower(towerX[i], towerY[i], number));
+      }
+      for (int i = 0; i < wallAmount; i++) {
+        walls.add(new Wall(wallX[i], wallY[i], number));
+      }
     }
   }
 
