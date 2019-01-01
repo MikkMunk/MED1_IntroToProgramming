@@ -30,8 +30,6 @@ class Wall {
 
     rotate(wallRotation);
 
-
-
     fill(#816331);
     rect(0, 0, w, l);
     for (int j = 0; j <= lMulti; j++) {

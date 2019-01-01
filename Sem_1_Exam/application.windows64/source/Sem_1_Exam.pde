@@ -8,7 +8,9 @@ Player player;
 UserInterface ui;
 
 int areaNumber, 
-  score;
+  score, 
+  timerMax = 10800, //Three minutes in seconds multiplied by framerate. 
+  timerCurrent = timerMax;
 
 float xPosPlayer, 
   yPosPlayer, 
@@ -28,13 +30,14 @@ int enemyBulletSize = 10,
 color enemyBulletFillCol = #FC2008, 
   enemyBulletStrokeCol = #583430;
 
-boolean keyUp = false, 
+boolean gamePaused = true, 
+  keyUp = false, 
   keyDown = false, 
   keyLeft = false, 
-  keyRight = false,
-  cantUp = false,
-  cantDown = false,
-  cantLeft = false,
+  keyRight = false, 
+  cantUp = false, 
+  cantDown = false, 
+  cantLeft = false, 
   cantRight = false;
 
 void setup() {
@@ -43,7 +46,6 @@ void setup() {
   smooth();
   noStroke();
   textAlign(CENTER, CENTER);
-  textSize(30);
   rectMode(CENTER);
 
   xPosPlayer = width/2;
@@ -58,27 +60,22 @@ void setup() {
   player = new Player(xPosPlayer, yPosPlayer);
   ui = new UserInterface();
 
-  for (int x = -width; x <= width; x += width) {
-    for (int y = -height; y <= height; y += height) {
-      areas.add(new Area(xPosPlayer+x, yPosPlayer+y, areaNumber));
-      areaNumber++;
-    }
-  }
-
-  for (int i = enemyTowers.size()-1; i >= 0; i--) {
-    if (dist(xPosPlayer, yPosPlayer, -areaXPos+enemyTowers.get(i).xPos, -areaYPos+enemyTowers.get(i).yPos) < width/2) {
-      enemyTowers.remove(i);
-    }
-  }
+  reset();
 }
 
 void draw() {
   //background(#EAC766);
 
+  if (timerCurrent > 0 && !gamePaused) {
+    timerCurrent--;
+  } 
+
+  
+
   float x = mouseX - xPosPlayer;
   float y = mouseY - yPosPlayer;
   rotation = atan2(y, x);
-  
+
   if (touchingUp()) {
     cantUp = true;
   } else {
@@ -126,8 +123,8 @@ void draw() {
   }
 
   if (keyUp||keyDown||keyLeft||keyRight) {
-    areaXPos = (areaXPos + cos(moveRotation) * moveSpeed);
-    areaYPos = (areaYPos + sin(moveRotation) * moveSpeed);
+    areaXPos += cos(moveRotation) * moveSpeed;
+    areaYPos += sin(moveRotation) * moveSpeed;
 
     areaXPosVector = areaXPosPre - areaXPos;
     areaYPosVector = areaYPosPre - areaYPos;
@@ -197,28 +194,43 @@ void draw() {
   }
 
   ui.update();
+  if (timerCurrent == 0 || player.healthCurrent == 0) {
+    keyUp = false;
+    keyDown = false;
+    keyLeft = false;
+    keyRight = false;
+    player.fireActive = false;
+  }
 }
 
 void keyPressed() {
-  if (keyCode == UP || key == 'w' || key == 'W') {
-    if (!cantUp) {
-      keyUp = true;
+  if (gamePaused) {
+    gamePaused = false;
+  }
+  if (player.healthCurrent > 0 && timerCurrent > 0) {
+    if (keyCode == UP || key == 'w' || key == 'W') {
+      if (!cantUp) {
+        keyUp = true;
+      }
+    }
+    if (keyCode == DOWN || key == 's' || key == 'S') {
+      if (!cantDown) {
+        keyDown = true;
+      }
+    }
+    if (keyCode == LEFT || key == 'a' || key == 'A') {
+      if (!cantLeft) {
+        keyLeft = true;
+      }
+    }
+    if (keyCode == RIGHT || key == 'd' || key == 'D') {
+      if (!cantRight) {
+        keyRight = true;
+      }
     }
   }
-  if (keyCode == DOWN || key == 's' || key == 'S') {
-    if (!cantDown) {
-      keyDown = true;
-    }
-  }
-  if (keyCode == LEFT || key == 'a' || key == 'A') {
-    if (!cantLeft) {
-      keyLeft = true;
-    }
-  }
-  if (keyCode == RIGHT || key == 'd' || key == 'D') {
-    if (!cantRight) {
-      keyRight = true;
-    }
+  if (key == 'r' || key == 'R') {
+    reset();
   }
 }
 
@@ -238,7 +250,9 @@ void keyReleased() {
 }
 
 void mousePressed() {
-  player.fireActive = true;
+  if (player.healthCurrent > 0 && timerCurrent > 0) {
+    player.fireActive = true;
+  }
 }
 
 void mouseReleased() {
@@ -322,4 +336,50 @@ boolean touchingRight() {
     }
   }
   return false;
+}
+
+void reset() {
+  areaNumber = 0;
+  areaXPos = 0;
+  areaYPos = 0;
+  gamePaused = true;
+  player.healthCurrent = player.healthMax;
+  score = 0;
+  timerCurrent = timerMax;
+  for (int i = areas.size()-1; i >= 0; i--) {
+    for (int j = enemyTowers.size()-1; j >= 0; j--) {
+      if (enemyTowers.get(j).areaNumber == areas.get(i).number) {
+        enemyTowers.remove(j);
+      }
+    }
+    for (int j = walls.size()-1; j >= 0; j--) {
+      if (walls.get(j).areaNumber == areas.get(i).number) {
+        walls.remove(j);
+      }
+    }
+    areas.remove(i);
+  }
+
+
+  for (int x = -width; x <= width; x += width) {
+    for (int y = -height; y <= height; y += height) {
+      areas.add(new Area(xPosPlayer+x, yPosPlayer+y, areaNumber));
+      areaNumber++;
+    }
+  }
+
+  for (int i = enemyTowers.size()-1; i >= 0; i--) {
+    if (dist(xPosPlayer, yPosPlayer, -areaXPos+enemyTowers.get(i).xPos, -areaYPos+enemyTowers.get(i).yPos) < width/2) {
+      enemyTowers.remove(i);
+    }
+  }
+
+
+  for (int i = enemyBullets.size()-1; i >= 0; i--) {
+    enemyBullets.remove(i);
+  }
+
+  for (int i = playerBullets.size()-1; i >= 0; i--) {
+    playerBullets.remove(i);
+  }
 }

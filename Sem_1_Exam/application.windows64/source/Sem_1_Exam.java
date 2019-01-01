@@ -24,7 +24,9 @@ Player player;
 UserInterface ui;
 
 int areaNumber, 
-  score;
+  score, 
+  timerMax = 10800, //Three minutes in seconds multiplied by framerate. 
+  timerCurrent = timerMax;
 
 float xPosPlayer, 
   yPosPlayer, 
@@ -44,13 +46,14 @@ int enemyBulletSize = 10,
 int enemyBulletFillCol = 0xffFC2008, 
   enemyBulletStrokeCol = 0xff583430;
 
-boolean keyUp = false, 
+boolean gamePaused = true, 
+  keyUp = false, 
   keyDown = false, 
   keyLeft = false, 
-  keyRight = false,
-  cantUp = false,
-  cantDown = false,
-  cantLeft = false,
+  keyRight = false, 
+  cantUp = false, 
+  cantDown = false, 
+  cantLeft = false, 
   cantRight = false;
 
 public void setup() {
@@ -59,7 +62,6 @@ public void setup() {
   
   noStroke();
   textAlign(CENTER, CENTER);
-  textSize(30);
   rectMode(CENTER);
 
   xPosPlayer = width/2;
@@ -74,27 +76,22 @@ public void setup() {
   player = new Player(xPosPlayer, yPosPlayer);
   ui = new UserInterface();
 
-  for (int x = -width; x <= width; x += width) {
-    for (int y = -height; y <= height; y += height) {
-      areas.add(new Area(xPosPlayer+x, yPosPlayer+y, areaNumber));
-      areaNumber++;
-    }
-  }
-
-  for (int i = enemyTowers.size()-1; i >= 0; i--) {
-    if (dist(xPosPlayer, yPosPlayer, -areaXPos+enemyTowers.get(i).xPos, -areaYPos+enemyTowers.get(i).yPos) < width/2) {
-      enemyTowers.remove(i);
-    }
-  }
+  reset();
 }
 
 public void draw() {
   //background(#EAC766);
 
+  if (timerCurrent > 0 && !gamePaused) {
+    timerCurrent--;
+  } 
+
+  
+
   float x = mouseX - xPosPlayer;
   float y = mouseY - yPosPlayer;
   rotation = atan2(y, x);
-  
+
   if (touchingUp()) {
     cantUp = true;
   } else {
@@ -142,8 +139,8 @@ public void draw() {
   }
 
   if (keyUp||keyDown||keyLeft||keyRight) {
-    areaXPos = (areaXPos + cos(moveRotation) * moveSpeed);
-    areaYPos = (areaYPos + sin(moveRotation) * moveSpeed);
+    areaXPos += cos(moveRotation) * moveSpeed;
+    areaYPos += sin(moveRotation) * moveSpeed;
 
     areaXPosVector = areaXPosPre - areaXPos;
     areaYPosVector = areaYPosPre - areaYPos;
@@ -213,28 +210,43 @@ public void draw() {
   }
 
   ui.update();
+  if (timerCurrent == 0 || player.healthCurrent == 0) {
+    keyUp = false;
+    keyDown = false;
+    keyLeft = false;
+    keyRight = false;
+    player.fireActive = false;
+  }
 }
 
 public void keyPressed() {
-  if (keyCode == UP || key == 'w' || key == 'W') {
-    if (!cantUp) {
-      keyUp = true;
+  if (gamePaused) {
+    gamePaused = false;
+  }
+  if (player.healthCurrent > 0 && timerCurrent > 0) {
+    if (keyCode == UP || key == 'w' || key == 'W') {
+      if (!cantUp) {
+        keyUp = true;
+      }
+    }
+    if (keyCode == DOWN || key == 's' || key == 'S') {
+      if (!cantDown) {
+        keyDown = true;
+      }
+    }
+    if (keyCode == LEFT || key == 'a' || key == 'A') {
+      if (!cantLeft) {
+        keyLeft = true;
+      }
+    }
+    if (keyCode == RIGHT || key == 'd' || key == 'D') {
+      if (!cantRight) {
+        keyRight = true;
+      }
     }
   }
-  if (keyCode == DOWN || key == 's' || key == 'S') {
-    if (!cantDown) {
-      keyDown = true;
-    }
-  }
-  if (keyCode == LEFT || key == 'a' || key == 'A') {
-    if (!cantLeft) {
-      keyLeft = true;
-    }
-  }
-  if (keyCode == RIGHT || key == 'd' || key == 'D') {
-    if (!cantRight) {
-      keyRight = true;
-    }
+  if (key == 'r' || key == 'R') {
+    reset();
   }
 }
 
@@ -254,7 +266,9 @@ public void keyReleased() {
 }
 
 public void mousePressed() {
-  player.fireActive = true;
+  if (player.healthCurrent > 0 && timerCurrent > 0) {
+    player.fireActive = true;
+  }
 }
 
 public void mouseReleased() {
@@ -340,6 +354,52 @@ public boolean touchingRight() {
   return false;
 }
 
+public void reset() {
+  areaNumber = 0;
+  areaXPos = 0;
+  areaYPos = 0;
+  gamePaused = true;
+  player.healthCurrent = player.healthMax;
+  score = 0;
+  timerCurrent = timerMax;
+  for (int i = areas.size()-1; i >= 0; i--) {
+    for (int j = enemyTowers.size()-1; j >= 0; j--) {
+      if (enemyTowers.get(j).areaNumber == areas.get(i).number) {
+        enemyTowers.remove(j);
+      }
+    }
+    for (int j = walls.size()-1; j >= 0; j--) {
+      if (walls.get(j).areaNumber == areas.get(i).number) {
+        walls.remove(j);
+      }
+    }
+    areas.remove(i);
+  }
+
+
+  for (int x = -width; x <= width; x += width) {
+    for (int y = -height; y <= height; y += height) {
+      areas.add(new Area(xPosPlayer+x, yPosPlayer+y, areaNumber));
+      areaNumber++;
+    }
+  }
+
+  for (int i = enemyTowers.size()-1; i >= 0; i--) {
+    if (dist(xPosPlayer, yPosPlayer, -areaXPos+enemyTowers.get(i).xPos, -areaYPos+enemyTowers.get(i).yPos) < width/2) {
+      enemyTowers.remove(i);
+    }
+  }
+
+
+  for (int i = enemyBullets.size()-1; i >= 0; i--) {
+    enemyBullets.remove(i);
+  }
+
+  for (int i = playerBullets.size()-1; i >= 0; i--) {
+    playerBullets.remove(i);
+  }
+}
+
 class Area {
 
   int towerAmount = (int)random(2, 5), 
@@ -368,20 +428,19 @@ class Area {
     for (int i = 0; i < towerAmount; i++) {
       towerY[i] = (int)yPos + (int)random(-height/2, height/2);
     }
-    if (number != 4) {
-      for (int i = 0; i < towerAmount; i++) {
-        enemyTowers.add(new EnemyTower(towerX[i], towerY[i], number));
-      }
-    }
-
     for (int i = 0; i < wallAmount; i++) {
       wallX[i] = (int)xPos + (int)random(-width/2, width/2);
     }
     for (int i = 0; i < wallAmount; i++) {
       wallY[i] = (int)yPos + (int)random(-height/2, height/2);
     }
-    for (int i = 0; i < wallAmount; i++) {
-      walls.add(new Wall(wallX[i], wallY[i], number));
+    if (number != 4) {
+      for (int i = 0; i < towerAmount; i++) {
+        enemyTowers.add(new EnemyTower(towerX[i], towerY[i], number));
+      }
+      for (int i = 0; i < wallAmount; i++) {
+        walls.add(new Wall(wallX[i], wallY[i], number));
+      }
     }
   }
 
@@ -400,6 +459,7 @@ class Area {
     popMatrix();
   }
 }
+
 class EnemyBullet {
 
   float xPos, 
@@ -678,6 +738,7 @@ class Player {
 
     popMatrix();
     pushMatrix();
+    
     rotate(bodyRotation);
 
     fill(bodyCol);
@@ -813,9 +874,15 @@ class UserInterface {
     healthbarY = -120, 
     healthbarWidth = 40, 
     healthbarHeight = 100, 
-    scoreX = -80, 
-    scoreY = -60,
-    enemyUIIconYOffset = 30,
+    menuYOffset = -150, 
+    menuYDist = 30, 
+    scoreX = -120, 
+    scoreY = -60, 
+    timerX = -75, 
+    timerY = -70, 
+    timerSize = 50, 
+    timerDia = timerSize/2, 
+    enemyUIIconYOffset = 30, 
     widthElem1 = 200, 
     heightElem1 = 40, 
     widthElem2 = 40, 
@@ -866,6 +933,7 @@ class UserInterface {
     rect(0, -heightElem1, -widthElem1, heightElem1);
 
     fill(player.legCol);
+    textSize(30);
     text(score, scoreX, scoreY);
 
     fill(enemyBulletFillCol);
@@ -874,10 +942,53 @@ class UserInterface {
     ellipse(scoreX, scoreY + enemyUIIconYOffset, enemyBulletSize, enemyBulletSize);
     noStroke();
 
+    fill(255, 150);
+    ellipse(timerX, timerY, timerSize, timerSize);
+
+    strokeWeight(2);
+    stroke(player.armCol);
+    line(timerX, timerY, timerX, timerY-timerDia);
+
+    stroke(player.bodyCol);
+    line(timerX+timerDia, timerY, timerX+timerDia-timerDia/3, timerY);
+    line(timerX-timerDia, timerY, timerX-timerDia+timerDia/3, timerY);
+    line(timerX, timerY+timerDia, timerX, timerY+timerDia-timerDia/3);
+
+    float tic = map(timerMax-timerCurrent, 0, timerMax, 0, TWO_PI) - HALF_PI;
+    if (timerCurrent > timerMax/4) {
+      stroke(player.legCol);
+    } else {
+      stroke(enemyBulletFillCol);
+    }
+    strokeWeight(3);
+    line(timerX, timerY, timerX + cos(tic) * timerDia, timerY + sin(tic) * timerDia);
+    noStroke();
+
     popMatrix();
     rectMode(CENTER);
+
+    if (gamePaused) {
+      fill(player.legCol);
+      textSize(30);
+      text("Game starts when you move", xPosPlayer, yPosPlayer+menuYOffset);
+      textSize(16);
+      text("Destroy as many Turrets within the time limit and stay alive", xPosPlayer, yPosPlayer+menuYOffset+menuYDist);
+      textSize(12);
+      text("Controls: Move with WASD or arrows, aim and fire with mouse, restart with R", xPosPlayer, yPosPlayer+menuYOffset+menuYDist*2);
+    }
+
+    if (timerCurrent == 0 || player.healthCurrent == 0) {
+      fill(player.legCol);
+      textSize(40);
+      text("Game Over", xPosPlayer, yPosPlayer+menuYOffset);
+      textSize(20);
+      text("Final Score: ", xPosPlayer, yPosPlayer+menuYOffset+menuYDist);
+      textSize(30);
+      text(score, xPosPlayer, yPosPlayer+menuYOffset+menuYDist*2.5f);
+    }
   }
 }
+
 class Wall {
 
   int xPos, 
@@ -909,8 +1020,6 @@ class Wall {
      }*/
 
     rotate(wallRotation);
-
-
 
     fill(0xff816331);
     rect(0, 0, w, l);

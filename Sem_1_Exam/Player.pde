@@ -87,6 +87,7 @@ class Player {
 
     popMatrix();
     pushMatrix();
+    
     rotate(bodyRotation);
 
     fill(bodyCol);
