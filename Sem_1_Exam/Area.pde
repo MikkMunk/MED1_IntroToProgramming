@@ -49,10 +49,12 @@ class Area {
     fill(#EAC766);
     rect(xPos, yPos, width, height);
 
-    stroke(#D1AA1E, 150);
-    strokeWeight(strokeSize);
-    ellipse(xPos, yPos, size, size);
-    noStroke();
+    if (number == 4) {
+      stroke(#D1AA1E, 150);
+      strokeWeight(strokeSize);
+      ellipse(xPos, yPos, size, size);
+      noStroke();
+    }
 
     popMatrix();
   }

@@ -3,7 +3,9 @@ class UserInterface {
   float xPosL = 0, 
     yPosB = height, 
     xPosR = width, 
-    healthbarFill;
+    healthbarFill,
+    startColValue = 50,
+    reCol;
 
   int healthbarX = 60, 
     healthbarY = -120, 
@@ -49,7 +51,8 @@ class UserInterface {
     healthbarFill = healthbarHeight*(player.healthCurrent/player.healthMax);
     fill(player.legCol);
     rect(healthbarX, healthbarY, healthbarWidth, healthbarHeight);
-    fill(50, 255, 50);
+    reCol = map(player.healthMax-player.healthCurrent, 0, player.healthMax, startColValue, 255 - startColValue);
+    fill(startColValue + reCol, 255 - reCol, startColValue);
     rect(healthbarX, healthbarY+(player.healthMax-healthbarFill), healthbarWidth, healthbarFill);
 
     popMatrix();
@@ -119,7 +122,8 @@ class UserInterface {
       textSize(20);
       text("Final Score: ", xPosPlayer, yPosPlayer+menuYOffset+menuYDist);
       textSize(30);
-      text(score, xPosPlayer, yPosPlayer+menuYOffset+menuYDist*2.5);
+      finalScore = score * (1 + ((player.healthCurrent / player.healthMax) / 2));
+      text(round(finalScore), xPosPlayer, yPosPlayer + menuYOffset + menuYDist * 2.5);
     }
   }
 }

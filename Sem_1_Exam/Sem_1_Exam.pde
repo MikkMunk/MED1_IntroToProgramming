@@ -8,12 +8,13 @@ Player player;
 UserInterface ui;
 
 int areaNumber, 
-  score, 
+  score,
   timerMax = 10800, //Three minutes in seconds multiplied by framerate. 
   timerCurrent = timerMax;
 
 float xPosPlayer, 
-  yPosPlayer, 
+  yPosPlayer,
+  finalScore, 
   areaXPos, 
   areaYPos, 
   areaXPosPre, 

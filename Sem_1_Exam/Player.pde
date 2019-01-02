@@ -30,7 +30,10 @@ class Player {
     legPos = 20, 
     legWidth = 20, 
     legLength = 35, 
-    legMoveCap = 10, 
+    legMoveCap = 10,
+    lightX = 13,
+    lightY = 17,
+    lightSize = 5,
     minimumTurretRot = 100, 
     bulletPerShot = 5;
 
@@ -95,7 +98,7 @@ class Player {
     for (int i = enemyBullets.size()-1; i >= 0; i--) {
       if (dist(enemyBullets.get(i).xPos, enemyBullets.get(i).yPos, xPos, yPos) <= ((bodyWidth/2)+(enemyBulletSize/2))) {
         healthCurrent -= enemyBullets.get(i).damage;
-        if (healthCurrent <= 0) {
+        if (healthCurrent <= 0 && timerCurrent > 0) {
           healthCurrent = 0;
         }
         enemyBullets.remove(i);
@@ -107,7 +110,10 @@ class Player {
 
     fill(glassCol, 200);
     rect(glassPos, 0, glassLength, glassWidth);
-
+    
+    fill(ui.startColValue + ui.reCol, 255 - ui.reCol, ui.startColValue);
+    ellipse(lightX, lightY, lightSize, lightSize);
+    ellipse(lightX, -lightY, lightSize, lightSize);
 
     float mouseDist = dist(xPos, yPos, mouseX, mouseY);
     if (mouseDist < minimumTurretRot) {
