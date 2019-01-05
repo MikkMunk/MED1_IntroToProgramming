@@ -19,7 +19,8 @@ class Player {
     driverLength = 10, 
     glassPos = 5, 
     glassWidth = 20, 
-    glassLength = 35, 
+    glassLength = 35,
+    glassAlpha = 200, 
     turretPos = 35, 
     turretWidth = 10, 
     turretLength = 30, 
@@ -30,16 +31,17 @@ class Player {
     legPos = 20, 
     legWidth = 20, 
     legLength = 35, 
-    legMoveCap = 10,
-    lightX = 13,
-    lightY = 17,
-    lightSize = 5,
+    legMoveCap = 10, 
+    lightX = 13, 
+    lightY = 17, 
+    lightSize = 5, 
     minimumTurretRot = 100, 
     bulletPerShot = 5;
 
   color bodyCol = #5F6164, 
     armCol = #4B4E52, 
-    legCol = #2B2C2E, 
+    legCol = #2B2C2E,
+    turretCol = #7E8186, 
     glassCol = #799BCE;
 
   boolean walkAnim = false, 
@@ -80,9 +82,9 @@ class Player {
     }
 
     pushMatrix();
-    translate(xPos, yPos);
+    translate(xPos, yPos); //translate to find center point of player character.
     pushMatrix();
-    rotate(legRotation);
+    rotate(legRotation); //New matrix layer for leg rotation, since they move independent from the rest of the object.
 
     fill(legCol);
     rect(legMove, legPos, legLength, legWidth);
@@ -90,39 +92,42 @@ class Player {
 
     popMatrix();
     pushMatrix();
-    
-    rotate(bodyRotation);
+
+    rotate(bodyRotation); //pop and push for new matrix that is not affected by the previous, this is for the other parts of the object.
 
     fill(bodyCol);
     rect(0, 0, bodyLength, bodyWidth);
-    for (int i = enemyBullets.size()-1; i >= 0; i--) {
+    for (int i = enemyBullets.size()-1; i >= 0; i--) { //Check all enemy bullets and take damage if the come too close.
       if (dist(enemyBullets.get(i).xPos, enemyBullets.get(i).yPos, xPos, yPos) <= ((bodyWidth/2)+(enemyBulletSize/2))) {
-        healthCurrent -= enemyBullets.get(i).damage;
-        if (healthCurrent <= 0 && timerCurrent > 0) {
-          healthCurrent = 0;
+        if (timerCurrent > 0) {
+          healthCurrent -= enemyBullets.get(i).damage;
+          playerHitSFX.play();
+          if (healthCurrent <= 0) {
+            healthCurrent = 0;
+          }
         }
         enemyBullets.remove(i);
       }
     }
 
     fill(0);
-    ellipse(driverPos, 0, driverLength, driverWidth);
+    ellipse(driverPos, 0, driverLength, driverWidth); //Create visuals for player entity.
 
-    fill(glassCol, 200);
+    fill(glassCol, glassAlpha);
     rect(glassPos, 0, glassLength, glassWidth);
-    
-    fill(ui.startColValue + ui.reCol, 255 - ui.reCol, ui.startColValue);
+
+    fill(ui.startColValue + ui.reCol, 255 - ui.reCol, ui.startColValue); //Add two lights that show health levels by using the color of the health bar.
     ellipse(lightX, lightY, lightSize, lightSize);
     ellipse(lightX, -lightY, lightSize, lightSize);
 
-    float mouseDist = dist(xPos, yPos, mouseX, mouseY);
-    if (mouseDist < minimumTurretRot) {
+    float mouseDist = dist(xPos, yPos, mouseX, mouseY); //The upper body is already rotating to face the cursor, but we also want the turrets that are pushed to the sides, to also turn directly towards it.
+    if (mouseDist < minimumTurretRot) { //For gameplay purposes we want a minimum value to the rotation.
       mouseDist = minimumTurretRot;
     } 
-    turretRotation = atan(mouseDist/turretPos);
+    turretRotation = atan(mouseDist/turretPos); //We find this rotation by using the distance from the center of the player object to the mouse, and divide it with the distance from same point but to the turrets. This is alse called the inverse tangent.
 
-    fill(#7E8186);
-    pushMatrix();
+    fill(turretCol);
+    pushMatrix(); //We then add layers and visuals for each turret.
     translate(0, turretPos);
     rotate(turretRotation);
 
@@ -144,7 +149,7 @@ class Player {
     popMatrix();
     popMatrix();
 
-    if (!fireReady) {
+    if (!fireReady) { //Same as with towers.
       currentFireDelay--;
       if (currentFireDelay == 0) {
         fireReady = true;
@@ -156,6 +161,7 @@ class Player {
       for (int i = 0; i < bulletPerShot; i++) {
         playerBullets.add(new PlayerBullet(xPosPlayer, yPosPlayer, rotation, player.turretRotation, fireAltBarrel));
       }
+      playerFireSFX.play();
       explosions.add(new Explosion(xPosPlayer, yPosPlayer, rotation, false, 0, false, fireAltBarrel));
       fireAltBarrel = !fireAltBarrel;
       fireReady = false;

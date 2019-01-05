@@ -28,14 +28,16 @@ class UserInterface {
     widthElem3 = 130, 
     heightElem3 = 200, 
     rotElem3 = -60;
+    
+    color timerAlpha = 150;
 
   UserInterface() {
   }
 
   void update() {
-    rectMode(CORNER);
+    rectMode(CORNER); //Switching rectMode for ease of positioning.
     pushMatrix();
-    translate(xPosL, yPosB);
+    translate(xPosL, yPosB); //First we translate to the left corner to place elements in relation to this as a center point.
 
     pushMatrix();
     rotate(radians(rotElem3));
@@ -48,11 +50,11 @@ class UserInterface {
     fill(player.armCol);
     rect(0, -heightElem1, widthElem1, heightElem1);
 
-    healthbarFill = healthbarHeight*(player.healthCurrent/player.healthMax);
+    healthbarFill = healthbarHeight*(player.healthCurrent/player.healthMax); //Finding health percentage to create rectangles with the proper sizes to show current health.
     fill(player.legCol);
     rect(healthbarX, healthbarY, healthbarWidth, healthbarHeight);
-    reCol = map(player.healthMax-player.healthCurrent, 0, player.healthMax, startColValue, 255 - startColValue);
-    fill(startColValue + reCol, 255 - reCol, startColValue);
+    reCol = map(player.healthMax-player.healthCurrent, 0, player.healthMax, startColValue, 255 - startColValue); //Also mapping reCol to be same percentage between 50 and 205, as missing health is between 0 and max health
+    fill(startColValue + reCol, 255 - reCol, startColValue); //when using this in fill by both adding the value to one perimeter, while subtracting it from another, the colored objects will be able to fade between chosen colors.
     rect(healthbarX, healthbarY+(player.healthMax-healthbarFill), healthbarWidth, healthbarFill);
 
     popMatrix();
@@ -80,7 +82,7 @@ class UserInterface {
     ellipse(scoreX, scoreY + enemyUIIconYOffset, enemyBulletSize, enemyBulletSize);
     noStroke();
 
-    fill(255, 150);
+    fill(255, timerAlpha); //Creating timer to show remaining time. 
     ellipse(timerX, timerY, timerSize, timerSize);
 
     strokeWeight(2);
@@ -92,20 +94,20 @@ class UserInterface {
     line(timerX-timerDia, timerY, timerX-timerDia+timerDia/3, timerY);
     line(timerX, timerY+timerDia, timerX, timerY+timerDia-timerDia/3);
 
-    float tic = map(timerMax-timerCurrent, 0, timerMax, 0, TWO_PI) - HALF_PI;
-    if (timerCurrent > timerMax/4) {
+    float tic = map(timerMax-timerCurrent, 0, timerMax, 0, TWO_PI) - HALF_PI; //Mapping tic to have the finger show time remaining on the timer, in relation to time remaining out of max, and PI*2.
+    if (timerCurrent > timerMax/4) { //If more than a fourth of the time is remaining color it same as player legs
       stroke(player.legCol);
-    } else {
+    } else { //If not color it red as enemy bullets.
       stroke(enemyBulletFillCol);
     }
     strokeWeight(3);
-    line(timerX, timerY, timerX + cos(tic) * timerDia, timerY + sin(tic) * timerDia);
+    line(timerX, timerY, timerX + cos(tic) * timerDia, timerY + sin(tic) * timerDia); //Add timer finger with one end in center of the timer, and the other at the edge in relation to what angle tic is between 0 and PI*2. 
     noStroke();
 
     popMatrix();
     rectMode(CENTER);
 
-    if (gamePaused) {
+    if (gamePaused) { //Show text in certain situations.
       fill(player.legCol);
       textSize(30);
       text("Game starts when you move", xPosPlayer, yPosPlayer+menuYOffset);
@@ -122,7 +124,7 @@ class UserInterface {
       textSize(20);
       text("Final Score: ", xPosPlayer, yPosPlayer+menuYOffset+menuYDist);
       textSize(30);
-      finalScore = score * (1 + ((player.healthCurrent / player.healthMax) / 2));
+      finalScore = score * (1 + ((player.healthCurrent / player.healthMax) / 2)); //Final score is based on tower kills multiplied by up to 1.5 based on remaining health.
       text(round(finalScore), xPosPlayer, yPosPlayer + menuYOffset + menuYDist * 2.5);
     }
   }

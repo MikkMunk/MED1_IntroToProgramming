@@ -9,7 +9,8 @@ class PlayerBullet {
     speed = random(9, 11), 
     damage = random(5, 10);
 
-  int size = 5;
+  int size = 5, 
+    alpha = 150;
 
   boolean fireAlt;
 
@@ -20,7 +21,7 @@ class PlayerBullet {
     turretRot = turretRot_temp;
     fireAlt = fireAlt_temp;
 
-    if (fireAlt) {
+    if (fireAlt) { //Construct the bullets at the right positions by the turrets.
       xPos += (player.turretPos * sin(bodyRot)) + ((player.turretLength/2) * cos(bodyRot));
       yPos -= (player.turretPos * cos(bodyRot)) - ((player.turretLength/2) * sin(bodyRot));
     } else {
@@ -29,11 +30,13 @@ class PlayerBullet {
     }
   }
 
-  void update() {
+  void update() { //Same as enemy bullets.
 
     distanceFlown += speed;
-    xPos += cos(bodyRot+dirDeviation) * speed;
+    xPos += cos(bodyRot+dirDeviation) * speed; //Adding deviation for randomized spread. Gameplay purposes.
     yPos += sin(bodyRot+dirDeviation) * speed;
+    xPos += areaXPosVector;
+    yPos += areaYPosVector;
 
     if (fireAlt) {
       xPos -= sin(bodyRot) * (HALF_PI-turretRot) * speed;
@@ -43,14 +46,7 @@ class PlayerBullet {
       yPos -= cos(bodyRot) * (HALF_PI-turretRot) * speed;
     }
 
-    xPos += areaXPosVector;
-    yPos += areaYPosVector;
-
-    pushMatrix();
-    translate(xPos, yPos);
-
-    fill(0, 150);
-    ellipse(0, 0, size, size);
-    popMatrix();
+    fill(0, alpha);
+    ellipse(xPos, yPos, size, size);
   }
 }
